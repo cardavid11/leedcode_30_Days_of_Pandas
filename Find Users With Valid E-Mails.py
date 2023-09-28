@@ -1,22 +1,25 @@
 import pandas as pd
 
 def valid_emails(users: pd.DataFrame) -> pd.DataFrame:
-    # A regular expression pattern is crafted to match the criteria for a valid email.
-    # ^[a-zA-Z] asserts position at start of the string and ensures the first character is a letter.
-    # [\w.-]* allows for any word character (alphanumeric + underscore), period, or dash, 
-    # appearing zero or more times. This forms the prefix name.
-    # @leetcode.com$ asserts position at the end of the string and ensures the domain is '@leetcode.com'.
-    pattern = r'^[a-zA-Z][\w.-]*@leetcode.com$'
+    # Access the string methods associated with the 'mail' column
+    users_mail = users['mail'].str
     
-    # The str.match() function is used to check whether the 'mail' column entries 
-    # match the regular expression pattern.
-    valid_email_mask = users['mail'].str.match(pattern)
+    # Use str.match() to check if the email format is correct, excluding the '@leetcode.com' domain part
+    # This regex pattern ensures the prefix starts with a letter and only contains letters, digits, underscores, periods, or dashes thereafter
+    matched_users = users_mail.match(r'^[A-Za-z][A-Za-z0-9_.-]*@leetcode\.com')
     
-    # Filtering the DataFrame using the boolean mask to retain only rows 
-    # with valid email addresses.
-    valid_email_users = users[valid_email_mask]
+    # Filter the DataFrame to keep only the rows with emails matching the above regex pattern
+    filtered_allowed_users = users[matched_users]
     
-    return valid_email_users
+    # Additionally, check if any email contains a question mark '?' using str.contains()
+    # The '~' operator negates the boolean values, so we are looking for emails that do NOT contain a question mark
+    filtered_not_allowed_emails = ~filtered_allowed_users['mail'].str.contains(r'\?')
+    
+    # Further filter the DataFrame to exclude any rows with emails containing a question mark
+    filtered_users = filtered_allowed_users[filtered_not_allowed_emails]
+    
+    return filtered_users
+
 
 # In this solution:
 # A regular expression pattern is crafted to match the criteria for a valid email.
@@ -69,9 +72,3 @@ def valid_emails(users: pd.DataFrame) -> pd.DataFrame:
 # pattern = re.compile(r'\d{3}')  # matches 3 digits
 # match = pattern.search("123")
 # print(match.group())  # Output: '123'
-
-
-
-
-
-    
