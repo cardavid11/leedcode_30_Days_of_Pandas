@@ -14,6 +14,7 @@ def count_occurrences(files: pd.DataFrame) -> pd.DataFrame:
     bear_mask = files['content'].str.contains(bear_regex, case=False)
     
     # Sum up the boolean values to get the count of occurrences for each word.
+    # In pandas, when you apply the .sum() method to a boolean Series (a Series of True and False values), it treats True as 1 and False as 0, and then sums these values together. So, in essence, it is counting the number of True values in the Series.
     bull_count = bull_mask.sum()
     bear_count = bear_mask.sum()
     
